@@ -1,8 +1,31 @@
+const SUPABASE_URL_ENV_KEYS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL"] as const;
+const SUPABASE_PUBLIC_KEY_ENV_KEYS = [
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "SUPABASE_PUBLISHABLE_DEFAULT_KEY",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_ANON_KEY",
+] as const;
+
+function readFirstEnv(keys: readonly string[]) {
+  for (const key of keys) {
+    const value = process.env[key];
+
+    if (value && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function getSupabaseUrl() {
+  return readFirstEnv(SUPABASE_URL_ENV_KEYS);
+}
+
 function getSupabasePublicKey() {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return readFirstEnv(SUPABASE_PUBLIC_KEY_ENV_KEYS);
 }
 
 function assertValidServiceRoleKey(value: string) {
@@ -14,7 +37,7 @@ function assertValidServiceRoleKey(value: string) {
 }
 
 export function hasSupabaseEnv() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && getSupabasePublicKey());
+  return Boolean(getSupabaseUrl() && getSupabasePublicKey());
 }
 
 export function hasSupabaseServiceRoleKey() {
@@ -22,12 +45,12 @@ export function hasSupabaseServiceRoleKey() {
 }
 
 export function getSupabaseEnv() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = getSupabaseUrl();
   const supabaseKey = getSupabasePublicKey();
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY in .env.local."
+      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) and NEXT_PUBLIC_SUPABASE_ANON_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in your environment."
     );
   }
 
@@ -35,13 +58,13 @@ export function getSupabaseEnv() {
 }
 
 export function getSupabaseServerEnv() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = getSupabaseUrl();
   const supabaseKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ?? getSupabasePublicKey();
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      "Missing Supabase server environment variables. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (recommended) in .env.local."
+      "Missing Supabase server environment variables. Set NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY (recommended) in your environment."
     );
   }
 
@@ -55,12 +78,12 @@ export function getSupabaseServerEnv() {
 }
 
 export function getSupabaseServiceRoleEnv() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = getSupabaseUrl();
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      "Missing SUPABASE_SERVICE_ROLE_KEY in .env.local. Add it to use server-side data access."
+      "Missing SUPABASE_SERVICE_ROLE_KEY in your environment. Add it to use server-side data access."
     );
   }
 

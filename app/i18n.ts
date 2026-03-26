@@ -262,7 +262,8 @@ const en: Copy = {
   moodTired: "Tired",
   moodHeavy: "Heavy",
   noScore: "No score",
-  setupMissingEnv: "Add Supabase keys to .env.local first.",
+  setupMissingEnv:
+    "Supabase keys are missing. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in local .env.local or in Vercel Environment Variables.",
   setupAuthPrompt:
     "Sign in to unlock your private diary, habits, stats, streaks, and reminders.",
   setupSchemaPrompt:
@@ -270,7 +271,8 @@ const en: Copy = {
   setupLoadError: "Could not load your data.",
   dashboardReady: "Open mode is on. You can use the app without login.",
   flashNeedSignIn: "Please sign in first",
-  flashMissingKeys: "Supabase keys are missing in .env.local",
+  flashMissingKeys:
+    "Supabase keys are missing. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your environment variables.",
   flashEmailPasswordRequired: "Email and password are required",
   flashAccountCreatedSignedIn: "Account created and signed in",
   flashAccountCreatedCheckMail:
@@ -377,7 +379,8 @@ const uz: Copy = {
   moodGrateful: "Minnatdor",
   moodTired: "Charchagan",
   moodHeavy: "Og'ir",
-  setupMissingEnv: "Avval .env.local ga Supabase kalitlarini kiriting.",
+  setupMissingEnv:
+    "Supabase kalitlari topilmadi. .env.local yoki Vercel Environment Variables ichida NEXT_PUBLIC_SUPABASE_URL va NEXT_PUBLIC_SUPABASE_ANON_KEY ni kiriting.",
   setupLoadError: "Ma'lumotlarni yuklab bo'lmadi.",
   flashNeedSignIn: "Avval tizimga kiring",
   flashSignedIn: "Kirish bajarildi",
