@@ -102,6 +102,17 @@ function getNoRowsAffectedMessage(entity: "habit" | "entry") {
     : "Could not change journal entry. It may not belong to your account anymore.";
 }
 
+function normalizeSupabaseError(message: string) {
+  const normalized = message.trim();
+  const lower = normalized.toLowerCase();
+
+  if (lower.includes("fetch failed") || lower.includes("failed to fetch")) {
+    return "Could not connect to Supabase. Check NEXT_PUBLIC_SUPABASE_URL and Supabase keys in Vercel, then redeploy.";
+  }
+
+  return normalized;
+}
+
 async function getRequestOrigin() {
   const headerStore = await headers();
   const explicitOrigin = headerStore.get("origin");
@@ -145,7 +156,7 @@ async function signInWithOAuth(
   });
 
   if (error) {
-    redirectWith("error", error.message, { lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { lang });
   }
 
   if (!data.url) {
@@ -169,7 +180,7 @@ async function getAuthContext(lang: ReturnType<typeof getLang>) {
   } = await authClient.auth.getUser();
 
   if (error) {
-    redirectWith("error", error.message, { lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { lang });
   }
 
   if (!user) {
@@ -202,7 +213,7 @@ export async function signUpAction(formData: FormData) {
   });
 
   if (error) {
-    redirectWith("error", error.message, { lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { lang });
   }
 
   if (data.session) {
@@ -234,7 +245,7 @@ export async function signInAction(formData: FormData) {
   });
 
   if (error) {
-    redirectWith("error", error.message, { lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { lang });
   }
 
   redirectWith("message", t.flashSignedIn, { lang });
@@ -291,7 +302,7 @@ export async function createOrUpdateHabitAction(formData: FormData) {
       .select("id");
 
     if (error) {
-      redirectWith("error", error.message, { ...nav, lang });
+      redirectWith("error", normalizeSupabaseError(error.message), { ...nav, lang });
     }
 
     if (!data || data.length === 0) {
@@ -304,7 +315,7 @@ export async function createOrUpdateHabitAction(formData: FormData) {
     });
 
     if (error) {
-      redirectWith("error", error.message, { ...nav, lang });
+      redirectWith("error", normalizeSupabaseError(error.message), { ...nav, lang });
     }
   }
 
@@ -334,7 +345,7 @@ export async function deleteHabitAction(formData: FormData) {
     .maybeSingle();
 
   if (ownedHabitError) {
-    redirectWith("error", ownedHabitError.message, { ...nav, lang });
+    redirectWith("error", normalizeSupabaseError(ownedHabitError.message), { ...nav, lang });
   }
 
   if (!ownedHabit) {
@@ -347,7 +358,7 @@ export async function deleteHabitAction(formData: FormData) {
     .eq("habit_id", habitId);
 
   if (logsError) {
-    redirectWith("error", logsError.message, { ...nav, lang });
+    redirectWith("error", normalizeSupabaseError(logsError.message), { ...nav, lang });
   }
 
   const { data, error } = await supabase
@@ -358,7 +369,7 @@ export async function deleteHabitAction(formData: FormData) {
     .select("id");
 
   if (error) {
-    redirectWith("error", error.message, { ...nav, lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { ...nav, lang });
   }
 
   if (!data || data.length === 0) {
@@ -396,7 +407,7 @@ export async function toggleHabitCompletionAction(formData: FormData) {
     .maybeSingle();
 
   if (ownedHabitError) {
-    redirectWith("error", ownedHabitError.message, {
+    redirectWith("error", normalizeSupabaseError(ownedHabitError.message), {
       date: targetDate,
       month,
       lang,
@@ -419,7 +430,7 @@ export async function toggleHabitCompletionAction(formData: FormData) {
       .eq("completed_on", targetDate);
 
     if (error) {
-      redirectWith("error", error.message, {
+      redirectWith("error", normalizeSupabaseError(error.message), {
         date: targetDate,
         month,
         lang,
@@ -446,7 +457,7 @@ export async function toggleHabitCompletionAction(formData: FormData) {
   );
 
   if (error) {
-    redirectWith("error", error.message, {
+    redirectWith("error", normalizeSupabaseError(error.message), {
       date: targetDate,
       month,
       lang,
@@ -504,7 +515,7 @@ export async function createOrUpdateJournalEntryAction(formData: FormData) {
       .select("id");
 
     if (error) {
-      redirectWith("error", error.message, { date: entryDate, month, lang });
+      redirectWith("error", normalizeSupabaseError(error.message), { date: entryDate, month, lang });
     }
 
     if (!data || data.length === 0) {
@@ -521,7 +532,7 @@ export async function createOrUpdateJournalEntryAction(formData: FormData) {
     });
 
     if (error) {
-      redirectWith("error", error.message, { date: entryDate, month, lang });
+      redirectWith("error", normalizeSupabaseError(error.message), { date: entryDate, month, lang });
     }
   }
 
@@ -558,7 +569,7 @@ export async function deleteJournalEntryAction(formData: FormData) {
     .select("id");
 
   if (error) {
-    redirectWith("error", error.message, { date: entryDate, month, lang });
+    redirectWith("error", normalizeSupabaseError(error.message), { date: entryDate, month, lang });
   }
 
   if (!data || data.length === 0) {
@@ -600,3 +611,4 @@ export async function deleteHabit(formData: FormData) {
 
   return deleteHabitAction(adapted);
 }
+
