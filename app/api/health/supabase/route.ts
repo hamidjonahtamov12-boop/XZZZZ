@@ -5,9 +5,12 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
 export const runtime = "nodejs";
 
 export async function GET() {
+  let supabaseHost = "";
+
   try {
     const { supabaseUrl } = getSupabaseEnv();
     const healthUrl = new URL("/auth/v1/health", supabaseUrl);
+    supabaseHost = healthUrl.host;
     const startedAt = Date.now();
 
     const response = await fetch(healthUrl.toString(), {
@@ -19,13 +22,14 @@ export async function GET() {
       ok: response.ok,
       status: response.status,
       elapsedMs: Date.now() - startedAt,
-      supabaseHost: healthUrl.host,
+      supabaseHost,
       preview: responseBody.slice(0, 200),
     });
   } catch (error) {
     return NextResponse.json(
       {
         ok: false,
+        supabaseHost,
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
