@@ -6,11 +6,13 @@ export const runtime = "nodejs";
 
 export async function GET() {
   let supabaseHost = "";
+  let supabaseHostBase64 = "";
 
   try {
     const { supabaseUrl } = getSupabaseEnv();
     const healthUrl = new URL("/auth/v1/health", supabaseUrl);
     supabaseHost = healthUrl.host;
+    supabaseHostBase64 = Buffer.from(supabaseHost).toString("base64");
     const startedAt = Date.now();
 
     const response = await fetch(healthUrl.toString(), {
@@ -23,6 +25,7 @@ export async function GET() {
       status: response.status,
       elapsedMs: Date.now() - startedAt,
       supabaseHost,
+      supabaseHostBase64,
       preview: responseBody.slice(0, 200),
     });
   } catch (error) {
@@ -30,6 +33,7 @@ export async function GET() {
       {
         ok: false,
         supabaseHost,
+        supabaseHostBase64,
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
